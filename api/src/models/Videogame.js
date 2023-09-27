@@ -14,5 +14,25 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    image: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.TEXT,
+    },
+    dor: {
+      type: DataTypes.STRING,
+    },
+    rating: {
+      type: DataTypes.DECIMAL,
+    },
+    platform: {
+      type: DataTypes.ARRAY(Datatypes.STRING),
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
   });
 };
