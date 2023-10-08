@@ -28,7 +28,7 @@ module.exports = (sequelize) => {
       type: DataTypes.DECIMAL,
     },
     platform: {
-      type: DataTypes.ARRAY(Datatypes.STRING),
+      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: false,
       validate: {
         notEmpty: true,
