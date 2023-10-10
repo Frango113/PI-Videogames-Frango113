@@ -1,8 +1,8 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import card from "../../Components/Card/Card";
+import Vgcard from "../../Components/Card/Card";
 import Paging from "../../Components/Paging/Paging";
 import stl from "../Home/Home.module.css";
 import genrefilter from "../../redux/Actions/genrefilter/index";
@@ -10,7 +10,7 @@ import vgorigin from "../../redux/Actions/vgorigin/index";
 import sortvgames from "../../redux/Actions/sortvgame/index";
 import SearchBar from "../../Components/nav/navbar";
 import getGenres from "../../redux/Actions/getgenres";
-import { getVideogames } from "../../redux/Actions/getvgames";
+import { getVgames } from "../../redux/Actions/getvgames";
 import deletegame from "../../redux/Actions/deletegame";
 
 export default function HomePage() {
@@ -22,20 +22,20 @@ export default function HomePage() {
   const lastVgameIndex = currentPage * vgamesPerPage;
   const firstVgIndex = lastVgameIndex - vgamesPerPage;
   const currentVgames = allVgames.slice(firstVgIndex, lastVgameIndex);
-  const [render, setRender] = useState("");
+  const [setRender] = useState("");
 
   const actualPage = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
   useEffect(() => {
-    dispatch(getVideogames());
+    dispatch(getVgames());
     dispatch(getGenres());
   }, [dispatch]);
 
   function handleDelete(id) {
     dispatch(deletegame(id));
     alert("The game has been removed");
-    dispatch(getVideogames());
+    dispatch(getVgames());
   }
   function handleGenreFilter(e) {
     e.preventDefault();
@@ -126,7 +126,7 @@ export default function HomePage() {
       <div className={stl.c5}>
         {currentVgames &&
           currentVgames.map((p) => (
-            <card
+            <Vgcard
               id={p.id}
               name={p.name}
               image={p.image}

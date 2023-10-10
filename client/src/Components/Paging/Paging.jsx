@@ -1,10 +1,10 @@
-import REact from "react";
-
+import React from "react";
+import stl from "./Paging.module.css";
 export default function Paging({
   vgamesPerPage,
   allVgames,
   currpage,
-  actualPAge,
+  actualPage,
 }) {
   const pageNumbers = [];
   const maxpage = Math.ceil(allVgames / vgamesPerPage);
@@ -12,4 +12,19 @@ export default function Paging({
   for (let i = 0; i < maxpage; i++) {
     pageNumbers.push(i + 1);
   }
+  return (
+    <nav>
+      <ul className={stl.pagination}>
+        {pageNumbers &&
+          pageNumbers.map((num) => {
+            return (
+              <li className={stl.pagenr} key={num}>
+                <button onClick={() => actualPage(num)}>{num}</button>
+              </li>
+            );
+          })}
+        <span>{`   Actual Page  ${currpage}`}</span>
+      </ul>
+    </nav>
+  );
 }

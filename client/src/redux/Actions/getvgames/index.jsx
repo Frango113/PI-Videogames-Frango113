@@ -1,7 +1,7 @@
 import axios from "axios";
 import { GET_VIDEOGAMES } from "../../actiontypes";
 
-export const getVideogames = () => {
+export const getVgames = () => {
   return async function (dispatch) {
     const videogames = await axios.get("http://localhost:3001/videogames");
     console.log(videogames);
@@ -9,4 +9,4 @@ export const getVideogames = () => {
   };
 };
 
-export default getVideogames;
+export default getVgames;

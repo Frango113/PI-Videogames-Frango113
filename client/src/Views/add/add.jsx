@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import postvgame from "../../redux/Actions/postvgame";
 import getVideogames from "../../redux/Actions/getvgames";
 import getGenres from "../../redux/Actions/getgenres";
 import getplatforms from "../../redux/Actions/getplatforms";
+import stl from "./add.module.css";
 
 function validate(input) {
   let errors = {};
@@ -18,12 +19,11 @@ function validate(input) {
 
 export default function AddVideogame() {
   const dispatch = useDispatch();
-  const history = useLocation();
 
   useEffect(() => {
     dispatch(getGenres());
     dispatch(getplatforms());
-  }, []);
+  }, [dispatch]);
 
   const [input, setInput] = useState({
     name: "",
@@ -64,13 +64,26 @@ export default function AddVideogame() {
       }));
     }
   };
-
+  const handleGenresChange = (ev) => {
+    const genre = ev.target.value;
+    if (ev.target.value) {
+      setInput((prevState) => ({
+        ...prevState,
+        genre: [...prevState.genre, genre],
+      }));
+    } else {
+      setInput((prevState) => ({
+        ...prevState,
+        genre: prevState.genre.filter((g) => g !== genre),
+      }));
+    }
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!input.name) {
       return alert("Name is required");
     }
-    if (!/^\d{4}\-\d{1,2}\-\d{1,2}$/.test(input.reldate)) {
+    if (!/^\d{4}\d{1,2}\d{1,2}$/.test(input.reldate)) {
       return alert(
         "Wrong released date format. Should be YYYY-MM-DD OR YYYY-M-D"
       );
@@ -101,4 +114,115 @@ export default function AddVideogame() {
       genre: [],
     });
   };
+  return (
+    <>
+      <div className={stl.avgwrapper}>
+        <h1 className={stl.h1}>Add your own videogame</h1>
+        <form className={stl.formarea} onSubmit={handleSubmit}>
+          <div className={stl.msgarea}>
+            <label>Description:</label>
+            <textarea
+              onChange={handleOnChange}
+              type="text"
+              name="description"
+              value={input.description}
+            />
+          </div>
+          <div className={stl.detailsarea}>
+            <label>Game Name:</label>
+            <input
+              onChange={handleOnChange}
+              onBlur={handleOnChange}
+              type="text"
+              name="name"
+              value={input.name}
+              autoComplete="off"
+            />
+            {errors.name && <p className={stl.error}> {errors.name} </p>}
+
+            <label>Image</label>
+            <input
+              onChange={handleOnChange}
+              type="text"
+              name="image"
+              value={input.image}
+              autoComplete="off"
+              placeholder="URL"
+            />
+
+            <label>Released date:</label>
+            <input
+              onChange={handleOnChange}
+              type="date"
+              name="reldate"
+              value={input.reldate}
+              placeholder="YYYY-MM-DD"
+            />
+
+            <label>Rating:</label>
+            <input
+              onChange={handleOnChange}
+              onBlur={handleOnChange}
+              type="text"
+              name="rating"
+              value={input.rating}
+              autoComplete="off"
+              placeholder="ex 4.3"
+            />
+            {errors.rating && <p className={stl.error}> {errors.rating} </p>}
+
+            <label>Select Platforms:</label>
+            <div className={stl.checkboxContainer}>
+              {allplatforms.sort().map((p) => {
+                return (
+                  <div key={p}>
+                    <input
+                      type="checkbox"
+                      value={p}
+                      onChange={handlePlatforms}
+                    />
+                    <label>{p}</label>
+                  </div>
+                );
+              })}
+            </div>
+            <ul className="ul">
+              <li>{input.platform.map((p) => p + " ,")}</li>
+            </ul>
+            {errors.platform && (
+              <p className={stl.error}> {errors.platform} </p>
+            )}
+
+            <label>Select Genres:</label>
+            {allGenres.sort().map((p) => {
+              return (
+                <div key={p.id} className={stl.checkboxContainer}>
+                  <input
+                    type="checkbox"
+                    value={p.id}
+                    onChange={handleGenresChange}
+                  />
+                  <label>{p.name}</label>
+                </div>
+              );
+            })}
+
+            <ul>
+              <li>{input.genre.map((p) => p + " ,")}</li>
+            </ul>
+
+            <button className={stl.bot} type="submit">
+              Add Game
+            </button>
+            <span>
+              <Link to="/home">
+                <button className={stl.bot2}>Back To Home</button>
+              </Link>{" "}
+            </span>
+          </div>
+        </form>
+      </div>
+      <div />
+    </>
+  );
 }
