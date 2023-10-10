@@ -21,7 +21,7 @@ export default function AddVideogame() {
   const history = useLocation();
 
   useEffect(() => {
-    dispatch(getgenres());
+    dispatch(getGenres());
     dispatch(getplatforms());
   }, []);
 
@@ -38,7 +38,7 @@ export default function AddVideogame() {
   const [errors, setErrors] = useState({});
   let allGenres = useSelector((state) => state.genres);
   let allplatforms = useSelector((state) => state.platforms);
-  allgenres = allgenres.filter((p) => p !== "All");
+  allGenres = allGenres.filter((p) => p !== "All");
 
   const handleOnChange = (e) => {
     setInput((prevState) => ({
