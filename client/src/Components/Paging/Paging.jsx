@@ -12,6 +12,7 @@ export default function Paging({
   for (let i = 0; i < maxpage; i++) {
     pageNumbers.push(i + 1);
   }
+
   return (
     <nav>
       <ul className={stl.pagination}>

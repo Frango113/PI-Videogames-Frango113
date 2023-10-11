@@ -1,18 +1,17 @@
-import genrefilter from "../Actions/genrefilter";
 import {
   GET_VIDEOGAMES,
   SORT_VGAMES,
   GET_GENRES,
   GENRES_FILTER,
   GET_PLATFORMS,
-} from "../actiontypes";
+} from "../actiontypes/index";
 import {
   GET_VGAMES_BY_NAME,
   VIDEOGAMES_ORIGIN,
   POST_VGAME,
   GET_VGAME_BY_ID,
   DELETE_VGAME,
-} from "../actiontypes";
+} from "../actiontypes/index";
 
 const initialState = {
   videogames: [],
@@ -110,7 +109,7 @@ export default function rootReducer(state = initialState, action) {
         };
       } else {
         let sortedArr =
-          action.payload == "asc"
+          action.payload === "asc"
             ? state.videogames.sort(function (a, b) {
                 if (a.name > b.name) {
                   return 1;

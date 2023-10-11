@@ -2,16 +2,16 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import Vgcard from "../../Components/Card/Card";
+import Card from "../../Components/Card/Card";
 import Paging from "../../Components/Paging/Paging";
 import stl from "../Home/Home.module.css";
-import genrefilter from "../../redux/Actions/genrefilter/index";
-import vgorigin from "../../redux/Actions/vgorigin/index";
-import sortvgames from "../../redux/Actions/sortvgame/index";
-import SearchBar from "../../Components/nav/navbar";
-import getGenres from "../../redux/Actions/getgenres";
-import { getVgames } from "../../redux/Actions/getvgames";
-import deletegame from "../../redux/Actions/deletegame";
+import genrefilter from "../../Redux/Actions/genrefilter/index";
+import vgorigin from "../../Redux/Actions/vgorigin/index";
+import sortvgames from "../../Redux/Actions/sortvgame/index";
+import SearchBar from "../../Components/SearchBar/SearchBar";
+import getGenres from "../../Redux/Actions/getgenres";
+import getVideogames from "../../Redux/Actions/getvgames";
+import deletegame from "../../Redux/Actions/deletegame";
 
 export default function HomePage() {
   const dispatch = useDispatch();
@@ -28,14 +28,14 @@ export default function HomePage() {
     setCurrentPage(pageNumber);
   };
   useEffect(() => {
-    dispatch(getVgames());
+    dispatch(getVideogames());
     dispatch(getGenres());
   }, [dispatch]);
 
   function handleDelete(id) {
     dispatch(deletegame(id));
     alert("The game has been removed");
-    dispatch(getVgames());
+    dispatch(getVideogames());
   }
   function handleGenreFilter(e) {
     e.preventDefault();
@@ -126,7 +126,7 @@ export default function HomePage() {
       <div className={stl.c5}>
         {currentVgames &&
           currentVgames.map((p) => (
-            <Vgcard
+            <Card
               id={p.id}
               name={p.name}
               image={p.image}

@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-//import { useState } from "react";
+import React from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
-import getVgbyName from "../../redux/Actions/getbyname";
-import stl from "./navbar.module.css";
+import getVgbyName from "../../Redux/Actions/getbyname";
+import stl from "./SearchBar.module.css";
 
 export default function SearchBar() {
   const dispatch = useDispatch();

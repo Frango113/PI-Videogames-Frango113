@@ -41,13 +41,13 @@
   }
   
   .hpbot {
-    background-color:rgb(0, 0, 0);
+    background-color: rgb(0, 0, 0);
     color: whitesmoke;
     padding-top: 1px;
     cursor: pointer;
     text-align: center;
     padding: 8px 24px;
-    border-radius: 8px;
+    border-radius: 10px;
     transition-duration: 0.4s;
     height: 60px;
   }
@@ -60,7 +60,7 @@
     margin-top: 8px;
     border: 2px solid black;
     height: 40px;
-    background: linear-gradient(45deg, #ff00ff, #00ffff);
+    background: linear-gradient(45deg, #f88d00, #ffffff);
     cursor:grab;
   }
   

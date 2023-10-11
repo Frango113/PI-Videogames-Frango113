@@ -10,6 +10,10 @@
     border: 2px solid white;
   }
 
+/*   .checkboxContainer label {
+    margin-right: 10px;
+    margin-bottom: 10px;
+  } */
 h1 {
     color:rgb(255, 255, 255);
     position: relative;
@@ -17,12 +21,12 @@ h1 {
 }
 .formarea {
   display:flex;
-  background: rgba(2, 71, 82, 0.596);
-  border-radius: 25px;
+  background: rgba(221, 122, 9, 0.596);
+  border-radius: 15px;
   padding: 1.9em;
   margin-top: 30px;
 /*  border-radius:80%; */
-  border: 3px solid rgb(12, 76, 173);
+  border: 3px solid rgb(0, 0, 0);
   box-shadow:4px 3px 6px 2px rgb(41, 233, 240); 
 }
 h3{
@@ -73,7 +77,7 @@ ul {
     color: #fff;
 }
 .bot {
-    background-color:olive;
+    background-color:rgb(0, 0, 0);
     color: whitesmoke;
     padding-top: 1px;
     cursor: pointer;

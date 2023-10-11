@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
-import getvgamebyid from "../../redux/Actions/getbyid";
+import getvgamebyid from "../../Redux/Actions/getbyid";
 import stl from "./details.module.css";
 export default function VideogameDetails(props) {
   const dispatch = useDispatch();

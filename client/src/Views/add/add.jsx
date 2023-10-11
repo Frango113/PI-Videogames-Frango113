@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import postvgame from "../../redux/Actions/postvgame";
-import getVideogames from "../../redux/Actions/getvgames";
-import getGenres from "../../redux/Actions/getgenres";
-import getplatforms from "../../redux/Actions/getplatforms";
-import stl from "./add.module.css";
+import postvgame from "../../Redux/Actions/postvgame";
+import getVideogames from "../../Redux/Actions/getvgames";
+import getGenres from "../../Redux/Actions/getgenres";
+import getplatforms from "../../Redux/Actions/getplatforms";
+import stl from "./Add.module.css";
 
 function validate(input) {
   let errors = {};
@@ -66,7 +66,8 @@ export default function AddVideogame() {
   };
   const handleGenresChange = (ev) => {
     const genre = ev.target.value;
-    if (ev.target.value) {
+
+    if (ev.target.checked) {
       setInput((prevState) => ({
         ...prevState,
         genre: [...prevState.genre, genre],
@@ -78,15 +79,14 @@ export default function AddVideogame() {
       }));
     }
   };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!input.name) {
       return alert("Name is required");
     }
-    if (!/^\d{4}\d{1,2}\d{1,2}$/.test(input.reldate)) {
-      return alert(
-        "Wrong released date format. Should be YYYY-MM-DD OR YYYY-M-D"
-      );
+    if (!/^(0[1-9]|1[012])[- /.]$/.test(input.reldate)) {
+      return alert("Wrong released date format. Should be MM-DD-YYYY");
     }
     if (!input.rating) {
       return alert("Rating is required");
@@ -114,6 +114,7 @@ export default function AddVideogame() {
       genre: [],
     });
   };
+
   return (
     <>
       <div className={stl.avgwrapper}>
@@ -156,7 +157,7 @@ export default function AddVideogame() {
               type="date"
               name="reldate"
               value={input.reldate}
-              placeholder="YYYY-MM-DD"
+              placeholder="MM-DD-YYYY"
             />
 
             <label>Rating:</label>

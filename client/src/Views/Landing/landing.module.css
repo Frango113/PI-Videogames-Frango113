@@ -1,5 +1,5 @@
 button {
-    background: black;
+    background: gray;
     cursor: pointer;
     border: none;
     padding: 16px 32px;
@@ -25,3 +25,7 @@ button:hover::before {
     filter: blur(8px);
     animation: glowing 20s linear infinite;
 }
+
+
+
+

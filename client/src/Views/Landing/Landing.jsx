@@ -1,8 +1,7 @@
-//import { getVideogames } from "../../redux/Actions/getvgames";
-import sortvgames from "../../redux/Actions/sortvgame";
+import getVideogames from "../../Redux/Actions/getvgames";
+import sortvgames from "../../Redux/Actions/sortvgame";
 import { Link } from "react-router-dom";
-import { getVgames } from "../../redux/Actions/getvgames";
-import styles from "./landing.module.css";
+import stl from "./Landing.module.css";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
@@ -10,16 +9,16 @@ export default function LandingPage() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getVgames());
+    dispatch(getVideogames());
   }, [dispatch]);
   function handleSortvideogames(e) {
     dispatch(sortvgames("asc"));
   }
   return (
-    <div className={styles.lpcontainer}>
-      <Link to="../Home/Home.jsx">
-        <button className={styles.but} onClick={handleSortvideogames}>
-          START App
+    <div className={stl.lpcontainer}>
+      <Link to="/home">
+        <button className={stl.but} onClick={handleSortvideogames}>
+          Iniciar
         </button>
       </Link>
     </div>

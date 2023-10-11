@@ -3,7 +3,7 @@
     margin: 1px;
     width: 1260px;
     right: 20% auto;
-  /*  background: bisque;*/
+ 
   }
   .detimg{
     display:flex;
@@ -61,32 +61,3 @@
     color: rgb(63, 6, 6); 
   }
 
-  /* Estilos para dispositivos móviles */
-@media all and (max-width: 768px) {
-  .wrapper {
-    flex-direction: column;
-    width: 100%;
-    margin: 0;
-  }
-
-  .detimg {
-    margin-left: 0;
-  }
-
-  .contarea {
-    margin: 20px;
-    width: 100%;
-  }
-}
-
-/* Estilos para dispositivos de pantalla pequeña */
-@media all and (max-width: 480px) {
-  .contarea {
-    margin: 10px;
-  }
-
-  .botback {
-    font-size: 14px;
-    padding: 8px 30px;
-  }
-}
