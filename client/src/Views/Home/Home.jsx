@@ -21,16 +21,16 @@ export default function HomePage() {
   const [vgamesPerPage] = useState(8);
   const lastVgameIndex = currentPage * vgamesPerPage;
   const firstVgIndex = lastVgameIndex - vgamesPerPage;
-  const currentVgames = allVgames.slice(firstVgIndex, lastVgameIndex);
+  const currentVgames = allVgames.slice[(firstVgIndex, lastVgameIndex)];
   const [setRender] = useState("");
 
-  const actualPage = (pageNumber) => {
+  const PageNow = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
   useEffect(() => {
     dispatch(getVideogames());
     dispatch(getGenres());
-  }, [dispatch]);
+  }, []);
 
   function handleDelete(id) {
     dispatch(deletegame(id));
@@ -120,7 +120,7 @@ export default function HomePage() {
           vgamesPerPage={vgamesPerPage}
           allVgames={allVgames.length}
           currpage={currentPage}
-          actualPage={actualPage}
+          nowPage={PageNow}
         />
       </div>
       <div className={stl.c5}>

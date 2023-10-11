@@ -92,9 +92,12 @@ export default function AddVideogame() {
       return alert("Rating is required");
     }
     if (
-      !/^(?:[1-9]\d{0,2}(?:,\d{3})*|0)(?:\.\d+)?$/.test(input.rating) ||
+      !/^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}?$/.test(
+        input.rating
+      ) ||
       input.rating < 0 ||
       input.rating > 5
+      //(?:[1-9]\d{0,2}(?:,\d{3})*|0)(?:\.\d+)?
     ) {
       return alert("Wrong format for Rating. Should be a number between 0-5");
     }
