@@ -1,42 +1,141 @@
-import React, { useEffect } from "react";
+import React from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
-import getvgamebyid from "../../Redux/Actions/getbyid";
-import stl from "./details.module.css";
-export default function VideogameDetails(props) {
+import { NavLink, useNavigate, useParams } from "react-router-dom";
+import {
+  getDetail,
+  deleteVgame,
+  getAllVGames,
+  clearDetail,
+} from "../../redux/actions";
+import style from "./detail.module.css";
+
+const Detail = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
+  const videoGame = useSelector((state) => state.detail);
+  const navigate = useNavigate();
+
   useEffect(() => {
-    dispatch(getvgamebyid(id));
-  }, [dispatch, id]);
-  var detail = useSelector((state) => state.videodetails);
+    dispatch(getDetail(id));
+    return () => dispatch(clearDetail());
+  }, []);
+
+  const removeHTMLtags = (string) => {
+    const regex = /<[^>]*>/g;
+    return string.replace(regex, "");
+  };
+
+  const deleteHandler = (event) => {
+    event.preventDefault();
+    dispatch(deleteVgame(id));
+    alert("Videogame deleted");
+    setTimeout(() => {
+      dispatch(getAllVGames());
+      navigate("/home");
+    }, 1000);
+  };
+
+  const editHandler = (event) => {
+    navigate("/update/" + id);
+  };
+
+  const goBack = (event) => {
+    event.preventDefault();
+    navigate("/home");
+    return () => dispatch(clearDetail());
+  };
+
   return (
-    <div className={stl.wrapper}>
-      <div className={stl.contarea}>
-        <div className={stl.lineflex}>
-          <h2>{detail.name} details</h2>
-          <Link to="/home">
-            <button className={stl.botback}>Home</button>
-          </Link>
+    <div>
+      {videoGame?.image ? (
+        <div className={style.cont}>
+          <div className={style.divsCont}>
+            <div className={style.nameCont}>
+              <h1 className={style.name}>{videoGame?.name}</h1>
+            </div>
+
+            <div className={style.descCont}>
+              <p className={style.description}>
+                {videoGame?.createdInDb
+                  ? videoGame?.description
+                  : removeHTMLtags(videoGame?.description)}
+              </p>
+            </div>
+
+            <div className={style.contRRPG}>
+              <div className={style.relRatCont}>
+                <h4 className={style.released}>
+                  Released: <br /> {videoGame?.released}
+                </h4>
+                <h4 className={style.rating}>
+                  Rating: <br /> {videoGame?.rating}
+                </h4>
+              </div>
+
+              <div className={style.platGenCont}>
+                <h4 className={style.platforms}>
+                  Platforms: <br /> {videoGame?.platforms?.join(", ")}
+                </h4>
+                <h4 className={style.genres}>
+                  Genres:
+                  <br /> {videoGame?.genres?.map((x) => x.name).join(", ")}
+                </h4>
+              </div>
+            </div>
+
+            <div className={style.imgCont}>
+              <img
+                className={style.image}
+                src={videoGame?.image}
+                alt={`image of ${videoGame.name}`}
+              />
+            </div>
+
+            <div className={style.buttons}>
+              <div>
+                <button className={style.backBtn} onClick={(e) => goBack(e)}>
+                  <img
+                    className={style.imgBtn}
+                    src="https://cdn-icons-png.flaticon.com/128/9678/9678540.png"
+                    alt="back"
+                  />
+                </button>
+              </div>
+              {videoGame?.createdInDb ? (
+                <div>
+                  <button
+                    className={style.editBtn}
+                    onClick={(e) => editHandler(e)}
+                  >
+                    <img
+                      className={style.imgBtn}
+                      src="https://cdn-icons-png.flaticon.com/128/650/650143.png"
+                      alt="edit"
+                    />
+                  </button>
+                  <button
+                    className={style.delBtn}
+                    onClick={(e) => deleteHandler(e)}
+                  >
+                    <img
+                      className={style.imgBtn}
+                      src="https://cdn-icons-png.flaticon.com/128/1214/1214428.png"
+                      alt="delete"
+                    />
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          </div>
         </div>
-        <img
-          className={stl.detimg}
-          src={detail.image}
-          alt="No image found"
-          width="250px"
-          heigth="300px"
-        ></img>
-        <h3>Description</h3>
-        <h5>{detail.description}</h5>
-        <div className={stl.lineflex}>
-          <h4>{`Rating:   ${detail.rating}`} </h4>
+      ) : (
+        <div className={style.divLoading}>
+          <p className={style.loading}>Loading...</p>
         </div>
-        <div className={stl.lineflex}>
-          <h4>{`Released date:  ${detail.released}`} </h4>
-        </div>
-        <h4>{`Platforms:  ${detail.platforms}`}</h4>
-        <h4>{`Genres: ${detail.genres}`}</h4>
-      </div>
+      )}
     </div>
   );
-}
+};
+
+export default Detail;

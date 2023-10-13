@@ -1,26 +1,23 @@
-import getVideogames from "../../Redux/Actions/getvgames";
-import sortvgames from "../../Redux/Actions/sortvgame";
-import { Link } from "react-router-dom";
-import stl from "./Landing.module.css";
-import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import React from "react";
+import { NavLink } from "react-router-dom";
+import style from "./landing.module.css";
 
-export default function LandingPage() {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(getVideogames());
-  }, [dispatch]);
-  function handleSortvideogames(e) {
-    dispatch(sortvgames("asc"));
-  }
+const LandingPage = () => {
   return (
-    <div className={stl.lpcontainer}>
-      <Link to="/home">
-        <button className={stl.but} onClick={handleSortvideogames}>
-          Iniciar
-        </button>
-      </Link>
-    </div>
+    <>
+      <div className={style.cont}>
+        <div className={style.welcomeCont}>
+          <p className={style.welcome}>Welcome To</p>
+        </div>
+        <h1 className={style.name}>Videogames</h1>
+        <div className={style.botonCont}>
+          <NavLink to="/home">
+            <button className={style.boton}>Iniciar</button>
+          </NavLink>
+        </div>
+      </div>
+    </>
   );
-}
+};
+
+export default LandingPage;

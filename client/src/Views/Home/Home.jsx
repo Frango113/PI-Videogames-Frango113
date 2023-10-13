@@ -1,142 +1,58 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
 import Card from "../../Components/Card/Card";
-import Paging from "../../Components/Paging/Paging";
-import stl from "../Home/Home.module.css";
-import genrefilter from "../../Redux/Actions/genrefilter/index";
-import vgorigin from "../../Redux/Actions/vgorigin/index";
-import sortvgames from "../../Redux/Actions/sortvgame/index";
-import SearchBar from "../../Components/SearchBar/SearchBar";
-import getGenres from "../../Redux/Actions/getgenres";
-import getVideogames from "../../Redux/Actions/getvgames";
-import deletegame from "../../Redux/Actions/deletegame";
+import { getAllVGames, notReload } from "../../redux/actions";
+import style from "./home.module.css";
 
-export default function HomePage() {
+const Home = () => {
   const dispatch = useDispatch();
-  const allVgames = useSelector((state) => state.videogames);
-  const allgenres = useSelector((state) => state.genres);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [vgamesPerPage] = useState(8);
-  const lastVgameIndex = currentPage * vgamesPerPage;
-  const firstVgIndex = lastVgameIndex - vgamesPerPage;
-  const currentVgames = allVgames.slice[(firstVgIndex, lastVgameIndex)];
-  const [setRender] = useState("");
+  const videoGames = useSelector((state) => state.paginado);
+  const coincidences = useSelector((state) => state.coincidences);
+  const not_reload = useSelector((state) => state.not_reload);
 
-  const PageNow = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
   useEffect(() => {
-    dispatch(getVideogames());
-    dispatch(getGenres());
+    if (!not_reload) {
+      dispatch(getAllVGames());
+      dispatch(notReload(true));
+    }
   }, []);
 
-  function handleDelete(id) {
-    dispatch(deletegame(id));
-    alert("The game has been removed");
-    dispatch(getVideogames());
-  }
-  function handleGenreFilter(e) {
-    e.preventDefault();
-    dispatch(genrefilter(e.target.value));
-  }
-  function handleOriginFilter(e) {
-    dispatch(vgorigin(e.target.value));
-    setCurrentPage(1);
-  }
-  function handleShowAll(e) {
-    dispatch(vgorigin("All"));
-    dispatch(sortvgames("asc"));
-  }
-  function handleSortvgames(e) {
-    e.preventDefault();
-    dispatch(sortvgames(e.target.value));
-    setRender(`Order${e.target.value}`);
-  }
-
   return (
-    <div className={stl.c1}>
-      <div className={stl.c2}>
-        <div>
-          <button
-            className={stl.hpbot}
-            onClick={(e) => {
-              handleShowAll(e);
-            }}
-          >
-            Load all videogames
-          </button>
-        </div>
-        <div>
-          <Link to="/videogame">
-            <button className={stl.hpbot}>Add New Videogame</button>
-          </Link>
-        </div>
-        <div>
-          <SearchBar />
-        </div>
-
-        <div>
-          <select
-            className={stl.hpfilter}
-            onChange={(e) => handleGenreFilter(e)}
-          >
-            <option value="">All Genres</option>
-            {allgenres.map((genre) => (
-              <option key={genre.id} value={genre.name}>
-                {genre.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <select
-            className={stl.hpfilter}
-            onChange={(e) => handleSortvgames(e)}
-            onBlur={(e) => handleSortvgames(e)}
-          >
-            <option value="">Select...</option>
-            <option value="asc">A-Z</option>
-            <option value="desc">Z-A</option>
-            <option value="rating">Rating</option>
-            <option value="date">Date</option>
-          </select>
-        </div>
-        <div>
-          <select
-            className={stl.hpfilter}
-            onChange={(e) => handleOriginFilter(e)}
-          >
-            <option value="All">Api+DB Games</option>
-            <option value="DB">Db Games</option>
-            <option value="API">Api Games</option>
-          </select>
-        </div>
+    <>
+      <div className={style.homeContenedor}>
+        {videoGames.length ? (
+          videoGames.map((vg) => {
+            return (
+              <div>
+                <Card
+                  key={vg.id}
+                  id={vg.id}
+                  name={vg.name}
+                  image={vg.image}
+                  platforms={vg.platforms}
+                  released={vg.released}
+                  rating={vg.rating}
+                  description={vg.description}
+                  genres={
+                    vg.genres ? vg.genres.map((x) => x.name + " ") : "undefined"
+                  }
+                />
+              </div>
+            );
+          })
+        ) : coincidences === false ? (
+          <div className={style.divLoading}>
+            <p className={style.loading}>No coincidences</p>
+          </div>
+        ) : (
+          <div className={style.divLoading}>
+            <p className={style.loading}>Loading...</p>
+          </div>
+        )}
       </div>
-      <div className={stl.c4}>
-        <Paging
-          vgamesPerPage={vgamesPerPage}
-          allVgames={allVgames.length}
-          currpage={currentPage}
-          nowPage={PageNow}
-        />
-      </div>
-      <div className={stl.c5}>
-        {currentVgames &&
-          currentVgames.map((p) => (
-            <Card
-              id={p.id}
-              name={p.name}
-              image={p.image}
-              genres={p.genres}
-              key={p.id}
-              rating={p.rating}
-              handleDelete={() => handleDelete(p.id)}
-            />
-          ))}
-      </div>
-    </div>
+    </>
   );
-}
+};
+
+export default Home;

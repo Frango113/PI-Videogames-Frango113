@@ -1,38 +1,45 @@
 import React from "react";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import getVgbyName from "../../Redux/Actions/getbyname";
-import stl from "./SearchBar.module.css";
+import getVgbyName from "../../Redux/Actions/";
+import style from "./SearchBar.module.css";
 
-export default function SearchBar() {
+const SearchBar = () => {
+  const imageSearch =
+    "https://cdn-icons-png.flaticon.com/128/10470/10470773.png";
+
   const dispatch = useDispatch();
-  const [name, setName] = useState("");
+  const [search, setSearch] = useState("");
 
-  function handleinputChange(e) {
-    e.precentDefault();
-    setName(e.target.value);
-  }
-  function handleSubmit(e) {
-    e.preventDefault();
-    dispatch(getVgbyName(name));
-    setName("");
-  }
+  const handleChange = (e) => {
+    setSearch(e.target.value);
+  };
+
+  const auxFunction = (e) => {
+    if (e.key === "Enter") {
+      handleSubmit();
+    }
+  };
+  const handleSubmit = () => {
+    dispatch(searchName(search));
+    setSearch("");
+  };
+
   return (
-    <div className={stl.sbcontainer}>
-      <input
-        className={stl.sbinput}
-        onChange={(e) => handleinputChange(e)}
-        type="text"
-        placeholder="Search by name"
-        value={name}
-      />
-      <button
-        className={stl.sbbot}
-        onClick={(e) => handleSubmit(e)}
-        type="submit"
-      >
-        Search
-      </button>
+    <div className={style.inputCont}>
+      <div className={style.inputCont2}>
+        <input
+          className={style.inputSearch}
+          type="text"
+          name="search"
+          placeholder="search by name..."
+          onChange={handleChange}
+          onKeyDown={(e) => auxFunction(e)}
+        />
+        <button onClick={handleSubmit} className={style.btnSearch}>
+          <img src={imageSearch} className={style.image.Lupa} alt="search" />
+        </button>
+      </div>
     </div>
   );
-}
+};

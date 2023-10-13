@@ -1,6 +1,7 @@
 import React from "react";
-import stlye from "./Paging.module.css";
+import style from "./Paging.module.css";
 import { useDispatch, useSelector } from "react-redux";
+import { paginado } from "../../Redux/Actions/actions";
 
 const Paging = () => {
   const dispatch = useDispatch;

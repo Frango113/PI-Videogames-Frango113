@@ -1,38 +1,49 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import Validation from "./validation";
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useState } from "react";
 import {
-  getGenres,
-  postVgame,
   clearErrors,
   getAllVGames,
+  getGenres,
   setNewErrors,
 } from "../../redux/actions";
-import { useNavigate } from "react-router-dom";
-import style from "./form.module.css";
+import Validation from "../../views/Form/validation";
+import { updateVgame } from "../../redux/actions";
+import { useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import style from "./update.module.css";
 
-const Form = () => {
+const Update = () => {
   const dispatch = useDispatch();
   const genres = useSelector((state) => state.genres);
+  const detail = useSelector((state) => state.detail);
+  const { id } = useParams();
   const navigate = useNavigate();
   const gErrors = useSelector((state) => state.errors);
+
+  const genresDetail = detail?.genres?.map((x) => x.name);
+  const platformsDetail = detail?.platforms;
 
   const [errors, setErrors] = useState({});
 
   const [input, setInput] = useState({
-    name: "",
-    description: "",
-    platforms: [],
-    released: "",
-    rating: 0,
-    genres: [],
-    image: "",
+    name: detail.name,
+    description: detail.description,
+    platforms: platformsDetail,
+    released: detail.released,
+    rating: detail.rating,
+    genres: genresDetail,
+    image: detail.image,
   });
 
   useEffect(() => {
     dispatch(getGenres());
-    return () => dispatch(clearErrors());
-  }, [dispatch]);
+    validateInput({
+      ...input,
+      platforms: [...input.platforms, platformsDetail],
+    });
+    validateInput({ ...input, genres: [...input.genres, genresDetail] });
+  }, []);
 
   const handleChange = (event) => {
     setInput({
@@ -70,25 +81,6 @@ const Form = () => {
     event.target.value = "defualt";
   };
 
-  const handlePlatforms = (event) => {
-    event.preventDefault();
-    const rep = input.platforms.find((plat) => plat === event.target.value);
-
-    if (event.target.value !== "default" && !rep) {
-      //Si el valor no es la primer option y no está repetido
-      setInput({
-        ...input,
-        platforms: [...input.platforms, event.target.value],
-      });
-      event.target.value = "default";
-
-      validateInput({
-        ...input,
-        platforms: [...input.platforms, event.target.value],
-      });
-    }
-  };
-
   const handleDeleteGen = (event) => {
     const filteredGen = input.genres.filter(
       (genre) => genre !== event.target.value
@@ -98,6 +90,24 @@ const Form = () => {
       genres: filteredGen,
     });
     validateInput({ ...input, genres: filteredGen });
+  };
+
+  const handlePlatforms = (event) => {
+    event.preventDefault();
+    const rep = input.platforms.find((plat) => plat === event.target.value);
+    if (event.target.value !== "default" && !rep) {
+      //Si el valor no es la primer option y no está repetido
+      setInput({
+        ...input,
+        platforms: [...input.platforms, event.target.value],
+      });
+      event.target.value = "default";
+      validateInput({
+        ...input,
+        platforms: [...input.platforms, event.target.value],
+      });
+    }
+    event.target.value = "defualt";
   };
 
   const handleDeletePlat = (event) => {
@@ -111,31 +121,26 @@ const Form = () => {
     validateInput({ ...input, platforms: filteredPlat });
   };
 
+  const goBack = (event) => {
+    event.preventDefault();
+    navigate("/detail/" + id);
+  };
+
   const isSubmitDisabled = Object.keys(errors).length > 0;
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
-    dispatch(postVgame(input)).then((postError) => {
-      if (!postError) {
-        setInput({
-          name: "",
-          description: "",
-          platforms: [],
-          released: "",
-          rating: 0,
-          genres: [],
-          image: "",
-        });
+    dispatch(updateVgame(input, id)).then((updateError) => {
+      if (!updateError) {
         dispatch(getAllVGames());
-        alert("created with success");
+        alert("updated with success");
         navigate("/home");
         dispatch(clearErrors());
       } else {
         dispatch(
           setNewErrors({
-            type: "postVideogame",
-            error: postError.response.data,
+            type: "updateVideogame",
+            error: updateError.response.data,
           })
         );
       }
@@ -145,7 +150,7 @@ const Form = () => {
   return (
     <div className={style.globalCont}>
       <div className={style.formContenedor}>
-        <h3 className={style.formTitle}>Create your own Videogame</h3>
+        <h3 className={style.formTitle}>Update your Videogame</h3>
 
         <form
           onSubmit={(event) => handleSubmit(event)}
@@ -154,6 +159,7 @@ const Form = () => {
           <div className={style.name}>
             <label>Name</label>
             <input
+              value={input.name}
               type="text"
               placeholder="introduce a name"
               name="name"
@@ -171,6 +177,7 @@ const Form = () => {
             <label>Description</label>
             <br />
             <textarea
+              value={input.description}
               placeholder="add a description"
               name="description"
               onChange={handleChange}
@@ -186,7 +193,14 @@ const Form = () => {
           <div className={style.relRat}>
             <div className={style.rel}>
               <label>Released</label>
-              <input type="date" name="released" onChange={handleChange} />
+
+              <input
+                value={input.released}
+                type="date"
+                name="released"
+                onChange={handleChange}
+              />
+
               <p
                 className={style.errores}
                 style={{ visibility: errors.released ? "visible" : "hidden" }}
@@ -197,13 +211,16 @@ const Form = () => {
 
             <div className={style.rat}>
               <label>Rating</label>
+
               <input
+                value={input.rating}
                 type="number"
                 name="rating"
                 min={0}
                 max={5}
                 onChange={handleChange}
               />
+
               <p
                 className={style.errores}
                 style={{ visibility: errors.rating ? "visible" : "hidden" }}
@@ -216,6 +233,7 @@ const Form = () => {
           <div className={style.platGen}>
             <div className={style.plat}>
               <label>Platforms</label>
+              <br />
               <select onChange={(event) => handlePlatforms(event)}>
                 <option value="default">choose platforms</option>
                 <option value={"Microsoft Windows"}>Microsoft Windows</option>
@@ -243,7 +261,8 @@ const Form = () => {
 
             <div className={style.gen}>
               <label>Genres</label>
-              <select onClick={(event) => handleGenres(event)}>
+              <br />
+              <select onChange={(event) => handleGenres(event)}>
                 <option value="default">choose genres</option>
                 {genres.map((g) => {
                   return <option value={g.name}>{g.name}</option>;
@@ -260,7 +279,9 @@ const Form = () => {
 
           <div className={style.imageInput}>
             <label>Image</label>
+
             <input
+              value={input.image}
               type="url"
               placeholder="send the URL of the image"
               name="image"
@@ -270,7 +291,15 @@ const Form = () => {
 
           <br />
           <br />
+
           <div className={style.buttonDiv}>
+            <button className={style.btnBack} onClick={(e) => goBack(e)}>
+              <img
+                className={style.imgBack}
+                src="https://cdn-icons-png.flaticon.com/128/9678/9678540.png"
+                alt="back"
+              />
+            </button>
             <button
               className={style.btn}
               disabled={isSubmitDisabled}
@@ -281,16 +310,22 @@ const Form = () => {
               }
               type="submit"
             >
-              Create
+              <img
+                className={style.imgUp}
+                src="https://cdn-icons-png.flaticon.com/128/157/157977.png"
+                alt="update"
+              />
             </button>
           </div>
           <p
             className={style.errores}
             style={{
-              visibility: gErrors?.postVideogame?.error ? "visible" : "hidden",
+              visibility: gErrors?.updateVideogame?.error
+                ? "visible"
+                : "hidden",
             }}
           >
-            {gErrors?.postVideogame?.error}
+            {gErrors?.updateVideogame?.error}
           </p>
         </form>
       </div>
@@ -343,4 +378,4 @@ const Form = () => {
   );
 };
 
-export default Form;
+export default Update;
