@@ -1,139 +1,265 @@
 import {
-  GET_VIDEOGAMES,
-  SORT_VGAMES,
+  GET_ALL_VGAMES,
+  GET_DETAIL,
   GET_GENRES,
-  GENRES_FILTER,
-  GET_PLATFORMS,
-} from "../actiontypes/index";
-import {
-  GET_VGAMES_BY_NAME,
-  VIDEOGAMES_ORIGIN,
   POST_VGAME,
-  GET_VGAME_BY_ID,
+  PAGINADO,
+  SEARCH_NAME,
   DELETE_VGAME,
-} from "../actiontypes/index";
-
-const initialState = {
-  videogames: [],
-  videodetails: [],
-  vgfilter: [],
+  UPDATE_VGAME,
+  CLEAR_DETAIL,
+  FILTER_BANK,
+  REMOVE_ALL_FILTER,
+  REMOVE_FILTER,
+  ERRORS,
+  CLEAR_ERRORS,
+  NOT_RELOAD,
+} from "../actiontypes";
+let initialState = {
+  videoGames: [],
+  pageNumbers: [],
+  gamesFiltered: [],
+  detail: {},
   genres: [],
-  platforms: [],
+  coincidences: true,
+  arr_of_filterObjs: [],
+  errors: {},
+  not_reload: false,
+  paginado: [],
+  currentPage: 1,
+  pages: [],
+  filteredPaginate: [],
 };
 
-export default function rootReducer(state = initialState, action) {
+function rootReducer(state = initialState, action) {
+  const ITEMS_PER_PAGE = 15;
+
   switch (action.type) {
-    case GET_VIDEOGAMES:
-      if (action.payload) {
-        return {
-          ...state,
-          videogames: action.payload,
-          vgfilter: action.payload,
-        };
-      } else {
-        return {
-          ...state,
-          videogames: [],
-        };
-      }
-    case GET_VGAMES_BY_NAME:
+    case GET_ALL_VGAMES:
+      const totalPagesGet = Math.ceil(action.payload.length / ITEMS_PER_PAGE);
+      const pagesGet = [...Array(totalPagesGet + 1).keys()].slice(1);
+
+      const indexOfLastP = state.currentPage * ITEMS_PER_PAGE;
+      const indexOfFirstP = indexOfLastP - ITEMS_PER_PAGE;
+
+      const vgRenderGet = action.payload.slice(indexOfFirstP, indexOfLastP);
       return {
         ...state,
-        videogames: action.payload,
+        videoGames: action.payload,
+        filteredPaginate: action.payload,
+        pages: pagesGet,
+        paginado: vgRenderGet,
       };
-    case GET_VGAME_BY_ID:
+    case PAGINADO:
+      var current;
+      if (isNaN(action.payload)) {
+        if (action.payload === "next") {
+          if (state.currentPage !== state.pages.length) {
+            current = state.currentPage + 1;
+          } else {
+            return { ...state };
+          }
+        } else if (action.payload === "end") {
+          if (state.currentPage !== state.pages.length) {
+            current = state.pages.length;
+          } else {
+            return { ...state };
+          }
+        } else if (action.payload === "prev") {
+          if (state.currentPage !== 1) {
+            current = state.currentPage - 1;
+          } else {
+            return { ...state };
+          }
+        } else if (action.payload === "start") {
+          if (state.currentPage !== 1) {
+            current = 1;
+          } else {
+            return { ...state };
+          }
+        }
+      } else {
+        current = action.payload;
+      }
+      const totalPages = Math.ceil(
+        state.filteredPaginate.length / ITEMS_PER_PAGE
+      );
+      const pages = [...Array(totalPages + 1).keys()].slice(1);
+
+      const indexOfLastPage = current * ITEMS_PER_PAGE;
+      const indexOfFirstPage = indexOfLastPage - ITEMS_PER_PAGE;
+
+      const vgRender = state.filteredPaginate.slice(
+        indexOfFirstPage,
+        indexOfLastPage
+      );
       return {
         ...state,
-        videodetails: action.payload,
+        currentPage: current,
+        paginado: vgRender,
+        pages: pages,
+      };
+
+    case GET_DETAIL:
+      return {
+        ...state,
+        detail: action.payload,
+      };
+    case NOT_RELOAD:
+      return {
+        ...state,
+        not_reload: action.payload,
       };
     case GET_GENRES:
-      let genre = action.payload;
-      genre.unshift("All");
       return {
         ...state,
-        genres: genre,
+        genres: action.payload,
       };
-    case GET_PLATFORMS:
-      console.log(action.payload);
+    case ERRORS:
+      const objError = action.payload;
       return {
         ...state,
-        platforms: action.payload,
+        errors: { ...state.errors, [objError.type]: objError.error },
       };
-    case GENRES_FILTER:
-      const allVgames = state.vgfilter;
-      const genrefilter =
-        action.payload === "All"
-          ? allVgames
-          : allVgames.filter((p) => p.genres.includes(action.payload));
-      if (genrefilter.length === 0) {
-        alert(`No videogames found for ${action.payload} genre`);
-        return state;
-      } else {
-        return {
-          ...state,
-          videogames: genrefilter,
-        };
-      }
+    case CLEAR_ERRORS:
+      return {
+        ...state,
+        errors: {},
+      };
     case POST_VGAME:
       return {
         ...state,
+        errors: {},
       };
+
+    case FILTER_BANK:
+      let array = state.arr_of_filterObjs;
+      //Me aseguro q no haya dos iguales
+      if (action.payload.type === "games")
+        array = array.filter((x) => x.type !== "games");
+      if (action.payload.type === "sort")
+        array = array.filter((x) => x.type !== "sort");
+      if (action.payload.type === "genres")
+        array = array.filter((x) => x.type !== "genres");
+      array = [...array, action.payload];
+      return {
+        ...state,
+        arr_of_filterObjs: array,
+      };
+
+    case REMOVE_FILTER:
+      let arr = state.arr_of_filterObjs;
+      let deletedFilter = arr.filter((x) => x.value !== action.payload);
+      return {
+        ...state,
+        arr_of_filterObjs: deletedFilter,
+      };
+    case FILTER_APPLY:
+      const filterObjs = state.arr_of_filterObjs;
+      const games = filterObjs.find((x) => x.type === "games");
+      const sort = filterObjs.find((x) => x.type === "sort");
+      const genres = filterObjs.find((x) => x.type === "genres");
+
+      let videoGames = state.videoGames;
+
+      if (games) {
+        if (games.value === "Existing") {
+          videoGames = videoGames.filter((x) => !x.createdInDb);
+        } else if (games.value === "Created") {
+          videoGames = videoGames.filter((x) => x.createdInDb);
+        }
+      }
+      if (sort) {
+        if (sort.value === "A-Z") {
+          videoGames = videoGames.sort((a, b) => a.name.localeCompare(b.name));
+        } else if (sort.value === "Z-A") {
+          videoGames = videoGames.sort((a, b) => b.name.localeCompare(a.name));
+        } else if (sort.value === "Increase Rating") {
+          videoGames = videoGames.sort((a, b) => a.rating - b.rating);
+        } else if (sort.value === "Decrease Rating") {
+          videoGames = videoGames.sort((a, b) => b.rating - a.rating);
+        }
+      }
+      if (genres) {
+        videoGames = videoGames.filter((x) =>
+          x.genres.some((j) => j.name === genres.value)
+        );
+      }
+      if (videoGames.length > 0) {
+        const totalPages = Math.ceil(videoGames.length / ITEMS_PER_PAGE);
+        const pages = [...Array(totalPages + 1).keys()].slice(1);
+
+        const indexOfLastPage = ITEMS_PER_PAGE;
+        const indexOfFirstPage = indexOfLastPage - ITEMS_PER_PAGE;
+
+        const vgRender = videoGames.slice(indexOfFirstPage, indexOfLastPage);
+
+        return {
+          ...state,
+          currentPage: 1,
+          filteredPaginate: videoGames,
+          pages: pages,
+          paginado: vgRender,
+        };
+      } else {
+        return {
+          ...state,
+          coincidences: false,
+          paginado: [],
+        };
+      }
+
+    case REMOVE_ALL_FILTER:
+      return {
+        ...state,
+        arr_of_filterObjs: [],
+      };
+
+    case SEARCH_NAME:
+      const response = action.payload;
+      if (response.length > 0) {
+        const totalPages = Math.ceil(response.length / ITEMS_PER_PAGE);
+        const pages = [...Array(totalPages + 1).keys()].slice(1);
+
+        const indexOfLastPage = ITEMS_PER_PAGE;
+        const indexOfFirstPage = indexOfLastPage - ITEMS_PER_PAGE;
+
+        const vgRender = response.slice(indexOfFirstPage, indexOfLastPage);
+
+        return {
+          ...state,
+          currentPage: 1,
+          filteredPaginate: response,
+          pages: pages,
+          paginado: vgRender,
+          coincidences: true,
+        };
+      } else {
+        return {
+          ...state,
+          coincidences: false,
+          paginado: [],
+        };
+      }
     case DELETE_VGAME:
       return {
         ...state,
       };
-    case VIDEOGAMES_ORIGIN:
-      const originVg = state.vgfilter;
-      const originfilter =
-        action.payload === "DB"
-          ? originVg.filter((p) => p.origin === "DB")
-          : originVg.filter((p) => p.origin === "API");
+    case UPDATE_VGAME:
       return {
         ...state,
-        videogames: action.payload === "All" ? state.vgfilter : originfilter,
+        detail: action.payload,
       };
-    case SORT_VGAMES:
-      if (action.payload === "rating") {
-        let sortedArr = state.videogames.sort(function (a, b) {
-          if (a.rating > b.rating) {
-            return -1;
-          }
-          if (b.rating > a.rating) {
-            return 1;
-          }
-          return 0;
-        });
-        return {
-          ...state,
-          videogames: sortedArr,
-        };
-      } else {
-        let sortedArr =
-          action.payload === "asc"
-            ? state.videogames.sort(function (a, b) {
-                if (a.name > b.name) {
-                  return 1;
-                }
-                if (b.name > a.name) {
-                  return -1;
-                }
-                return 0;
-              })
-            : state.videogames.sort(function (a, b) {
-                if (a.name > b.name) {
-                  return -1;
-                }
-                if (b.name > a.name) {
-                  return 1;
-                }
-                return 0;
-              });
-        return {
-          ...state,
-          videogames: sortedArr,
-        };
-      }
+    case CLEAR_DETAIL:
+      return {
+        ...state,
+        detail: {},
+      };
     default:
-      return state;
+      return {
+        ...state,
+      };
   }
 }
+
+export default rootReducer;
